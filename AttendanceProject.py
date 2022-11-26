@@ -7,12 +7,13 @@ from flask import Flask, render_template, Response
 from flask_socketio import SocketIO
 from sklearn.metrics import accuracy_score
 import socket
+
 hostname=socket.gethostname()
 IPAddr=socket.gethostbyname(hostname)
 app = Flask(__name__)
 socketioApp = SocketIO(app)
 
-path = 'BasicImages'
+path = 'ClassPictures'
 images = []
 classNames = []
 myList = os.listdir(path)
@@ -21,7 +22,7 @@ print(myList)
 for c1 in myList:
     curImg = cv.imread(f'{path}/{c1}')
     images.append(curImg)
-    classNames.append(os.path.splitext(c1)[0])
+    classNames.append(os.path.splitext(c1)[0].upper())
 print(classNames)
 
 def findEnc(images):
