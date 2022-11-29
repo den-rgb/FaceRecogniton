@@ -7,24 +7,26 @@ from flask import Flask, render_template, Response
 from flask_socketio import SocketIO
 import socket
 
-hostname=socket.gethostname()
-IPAddr=socket.gethostbyname(hostname)
-app = Flask(__name__)
-socketioApp = SocketIO(app)
+hostname=socket.gethostname() 
+IPAddr=socket.gethostbyname(hostname) #Get Ip address
+app = Flask(__name__)   #Flask app initialized
+socketioApp = SocketIO(app) #socket IO app initialized
 
 path = 'ClassPictures'
 images = []
 classNames = []
 myList = os.listdir(path)
 print(myList)
-print(IPAddr)
+print("http://"+IPAddr+":8080")
 
+#Loop through folder of images and use cv.imread to read the images and then add them to a separate list
 for c1 in myList:
     curImg = cv.imread(f'{path}/{c1}')
     images.append(curImg)
-    classNames.append(os.path.splitext(c1)[0].upper())
+    classNames.append(os.path.splitext(c1)[0].upper()) #get image names
 print(classNames)
 
+#encode list of images after inverting the color
 def findEnc(images):
     encodeList = []
     for img in images:
@@ -33,6 +35,7 @@ def findEnc(images):
         encodeList.append(encode)
     return encodeList
 
+#Add match to csv file along with date + time if not matched previously
 def markAttendance(name):
     with open('Attendance.csv','r+') as f:
         myDataList = f.readlines()
@@ -47,25 +50,24 @@ def markAttendance(name):
 
 encodeListKnown = findEnc(images)
 print('Encode Complete')
-
+#enable the video cam
 capture = cv.VideoCapture(0)
 def gen_frames():
-    
-
     while True:
-        success, img = capture.read()
-        imgs = cv.resize(img,(0,0),None,0.25,0.25)
-        imgs = cv.cvtColor(imgs,cv.COLOR_BGR2RGB)
+        success, img = capture.read() #read the frames
+        imgs = cv.resize(img,(0,0),None,0.25,0.25) #resize the image
+        imgs = cv.cvtColor(imgs,cv.COLOR_BGR2RGB) # invert the image from the cam
 
-        faceCurrFrame = fr.face_locations(imgs)
-        encodeCurrFrame = fr.face_encodings(imgs,faceCurrFrame)
+        faceCurrFrame = fr.face_locations(imgs) # locate face in frame
+        encodeCurrFrame = fr.face_encodings(imgs,faceCurrFrame) # encode the face in frame
 
+        #loop through list of images and see if the frame encoding matches
         for encodeFace, faceLoc in zip(encodeCurrFrame,faceCurrFrame):
             matches = fr.compare_faces(encodeListKnown, encodeFace)
             faceDist = fr.face_distance(encodeListKnown,encodeFace)
             print(faceDist)
             matchIndex = np.argmin(faceDist)
-
+            #if it matches draw a rectangle around it along with percentage and name
             if matches[matchIndex]:
                 name = classNames[matchIndex].upper()
                 percentage = np.round((faceDist[matchIndex]-100)*(-1),2) #percentage match
@@ -78,16 +80,16 @@ def gen_frames():
                 cv.putText(img,str(percentage)+"%",(x1+120,y2-10),cv.FONT_HERSHEY_COMPLEX,0.5,(255,255,255),1)
                 markAttendance(name)
 
-        ret, buffer = cv.imencode('.jpg', img)
+        ret, buffer = cv.imencode('.jpg', img) # convert capture to jpg for browser
         img = buffer.tobytes()
-
+        # concatenate frames and output
         yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
         
-        if cv.waitKey(1) == ord('q'): 
+        if cv.waitKey(1) == ord('q'): #break loop if q pressed
             break 
 
-    capture.release()
+    capture.release() #turn off cam
     cv.destroyAllWindows() #close all windows
 
 @app.route('/video_feed')

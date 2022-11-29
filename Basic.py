@@ -3,9 +3,9 @@ import numpy as np
 import face_recognition as fr
 
     
-img_Obama = fr.load_image_file('BasicImages/obama.jpg')
+img_Obama = fr.load_image_file('BasicImages/obama1.jpg')
 img_Obama = cv.cvtColor(img_Obama,cv.COLOR_BGR2RGB)
-img_Test = fr.load_image_file('BasicImages/obama1.jpg')
+img_Test = fr.load_image_file('BasicImages/obamaSmall.jpg')
 img_Test = cv.cvtColor(img_Test,cv.COLOR_BGR2RGB)
     
 faceLocator = fr.face_locations(img_Obama)[0]
