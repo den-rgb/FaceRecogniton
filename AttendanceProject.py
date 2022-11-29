@@ -18,6 +18,7 @@ images = []
 classNames = []
 myList = os.listdir(path)
 print(myList)
+print(IPAddr)
 
 for c1 in myList:
     curImg = cv.imread(f'{path}/{c1}')
@@ -45,12 +46,12 @@ def markAttendance(name):
             dtString = now.strftime('%H:%M:%S')
             f.writelines(f'\n{name},{dtString}')
 
+encodeListKnown = findEnc(images)
+print('Encode Complete')
 
+capture = cv.VideoCapture(0)
 def gen_frames():
-    encodeListKnown = findEnc(images)
-    print('Encode Complete')
-
-    capture = cv.VideoCapture(0)
+    
 
     while True:
         success, img = capture.read()
@@ -87,6 +88,7 @@ def gen_frames():
         if cv.waitKey(1) == ord('q'): 
             break 
 
+    capture.release()
     cv.destroyAllWindows() #close all windows
 
 @app.route('/video_feed')
@@ -105,6 +107,3 @@ def run():
 
 if __name__ == '__main__':
     socketioApp.run(app)
-
-
-
