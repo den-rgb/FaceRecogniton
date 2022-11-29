@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 from flask import Flask, render_template, Response
 from flask_socketio import SocketIO
-from sklearn.metrics import accuracy_score
 import socket
 
 hostname=socket.gethostname()

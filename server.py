@@ -1,12 +1,12 @@
 import eventlet
-from AttendanceProject import app
+from liveStream import app
 import socketio
 import face_recognition as fr
 import socket
 from waitress import serve
 
 sio = socketio.Server()
-appServer = socketio.WSGIApp(sio, app)
+
 
 hostname=socket.gethostname()
 IPAddr=socket.gethostbyname(hostname)
@@ -27,6 +27,5 @@ def disconnect(sid):
     
 
 if __name__ == '__main__':
-    # eventlet.wsgi.server(eventlet.listen((IPAddr, 5000)), appServer)
     serve(app, host=IPAddr, port=8080, url_scheme='RTMP', threads=6)
     print(IPAddr)
