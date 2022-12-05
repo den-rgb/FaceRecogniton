@@ -79,6 +79,13 @@ def gen_frames():
                 cv.putText(img,name,(x1+6,y2-6),cv.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
                 cv.putText(img,str(percentage)+"%",(x1+120,y2-10),cv.FONT_HERSHEY_COMPLEX,0.5,(255,255,255),1)
                 markAttendance(name)
+            else:
+                y1,x2,y2,x1 = faceLoc
+                y1,x2,y2,x1 = y1*4,x2*4,y2*4,x1*4
+                cv.rectangle(img,(x1,y1),(x2,y2),(200,30,90),2)
+                cv.rectangle(img,(x1,y2-35),(x2,y2),(200,30,90),cv.FILLED)
+                cv.putText(img,"unknown",(x1+6,y2-6),cv.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
+
 
         ret, buffer = cv.imencode('.jpg', img) # convert capture to jpg for browser
         img = buffer.tobytes()
